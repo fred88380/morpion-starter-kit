@@ -1,10 +1,22 @@
 const carres = document.querySelectorAll('.carre');
 const boutonRejouer = document.getElementById('boutonRejouer');
+const titre = document.getElementById('titre');
 let joueur = 1;
+let jeuActif = true;
+
+const resetGame = () => {
+    carres.forEach(carre => {
+        carre.style.backgroundPosition = '';
+        delete carre.dataset.play;
+    });
+    joueur = 1;
+    jeuActif = true;
+    titre.textContent = "Jeu du Morpion";
+};
 
 carres.forEach((carre, index) => {
     carre.addEventListener('click', () => {
-        if (carre.dataset.play) {
+        if (!jeuActif || carre.dataset.play) {
             return;
         }
 
@@ -17,8 +29,15 @@ carres.forEach((carre, index) => {
         }
 
         if (checkGagnant()) {
-            alert(`Le joueur ${joueur} a gagné !`);
-            boutonRejouer.style.display = 'block'; 
+            titre.textContent = `Le joueur ${joueur} a gagné !`;
+            jeuActif = false;
+            return;
+        }
+
+        const egalite = Array.from(carres).every(carre => carre.dataset.play);
+        if (egalite) {
+            titre.textContent = "Égalité !";
+            jeuActif = false;
             return;
         }
 
@@ -26,16 +45,18 @@ carres.forEach((carre, index) => {
     });
 });
 
+boutonRejouer.addEventListener('click', resetGame);
+
 const checkGagnant = () => {
     const resultatGagnant = [
-        [0, 1, 2], 
-        [3, 4, 5], 
-        [6, 7, 8], 
-        [0, 3, 6], 
-        [1, 4, 7], 
-        [2, 5, 8], 
-        [0, 4, 8], 
-        [2, 4, 6]  
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6]
     ];
 
     return resultatGagnant.some(combinaison => {
@@ -45,13 +66,3 @@ const checkGagnant = () => {
             carres[a].dataset.play === carres[c].dataset.play;
     });
 };
-
-
-boutonRejouer.addEventListener('click', () => {
-    carres.forEach(carre => {
-        carre.style.backgroundPosition = '';
-        delete carre.dataset.play;
-    });
-    joueur = 1; 
-    boutonRejouer.style.display = 'none'; 
-});
